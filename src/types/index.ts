@@ -8,31 +8,47 @@ export interface IProduct {
 }
 
 export interface IUser {
-	paymentMethod: string;
+	payment: string;
 	address: string;
 	email: string;
 	phone: string;
 }
 
-export interface ICatalogModel {
-  items: IProduct[];
-  preview: string | null;
+export interface ICatalogData {
   setItems(items: IProduct[]): void;
-  getProduct(id: string): IProduct;
+  getProduct(itemId: string): IProduct;
 }
 
-export type TProductCatalogInfo = Pick<IProduct, 'category' | 'image' | 'price' | 'title'>;
+export interface IOrderForm {
+    payment: string;
+    address: string;
+}
 
-export type TProductBasketInfo = Pick<IProduct, 'title' | 'price'>;
+export interface IContactsForm {
+    email: string;
+    phone: string;
+}
 
-export type TUserPaymentInfo = Pick<IUser, 'paymentMethod' | 'address'>;
+export interface IOrderBasketData {
+  total: number; 
+  items: string[];
+}
 
-export type TUserContactInfo = Pick<IUser, 'email' | 'phone'>;
-
-export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+export interface IOrderResult  {
+  id: string, 
+  total: number
+}
 
 export interface IApi {
     baseUrl: string;
     get<T>(uri: string): Promise<T>;
     post<T>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
 }
+
+export type OrderFormErrors = Partial<Record<keyof IOrderForm, string>>;
+
+export type ContactsFormErrors = Partial<Record<keyof IContactsForm, string>>;
+
+export type ApiPostMethods = 'POST' | 'PUT' | 'DELETE';
+
+export type TOrderData = IUser & IOrderBasketData;

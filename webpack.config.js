@@ -23,6 +23,7 @@ const config = {
   devServer: {
     open: true,
     host: "localhost",
+    liveReload: true,
     watchFiles: ["src/pages/*.html"],
     hot: true
   },
