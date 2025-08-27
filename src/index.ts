@@ -1,13 +1,12 @@
 import './scss/styles.scss';
 
 import { EventEmitter } from './components/base/events';
-import { API_URL,AppEvents,CDN_URL, containers, templates } from './utils/constants';
+import { API_URL,AppEvents,buttonSettings,CDN_URL, containers, templates } from './utils/constants';
 import { ProductsData } from './components/Model/ProductsData';
 import { UserData } from './components/Model/UserData';
 import { AppApi } from './components/AppApi';
 import { CardProduct } from './components/View/CardProduct';
 import { cloneTemplate, ensureElement } from './utils/utils';
-import { CardsContainer } from './components/View/CardsContainer';
 import { Page } from './components/View/Page';
 import { CardCatalog } from './components/View/CardCatalog';
 import { CardBasket } from './components/View/CardBasket';
@@ -41,7 +40,6 @@ const successTemplate = ensureElement<HTMLTemplateElement>(templates.success);
 const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>(containers.modal), events);
 
-const catalogContainer = new CardsContainer(ensureElement<HTMLElement>(containers.catalog)); 
 const basket = new Basket(cloneTemplate(basketTemplate), events);
 const order = new Order(cloneTemplate(orderTemplate), events);
 const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
@@ -59,12 +57,26 @@ events.on(AppEvents.view.cardsLoad, () => {
     const card = new CardCatalog(cloneTemplate(cardCatalogTemplate), events);
     return card.render(item);
   });
-  catalogContainer.render({catalog: cardArray});
+  page.render({catalog: cardArray});
 });
 
 events.on(AppEvents.view.cardSelect, (item: {card: CardCatalog}) => {
-  const inBasket = basketData.inBasket(item.card.id);
-  const card = new CardProduct(cloneTemplate(cardProductTemplate), events, inBasket);
+  let inBasket = basketData.inBasket(item.card.id);
+  const card = new CardProduct(cloneTemplate(cardProductTemplate), events, {
+    onClick: () => {
+      console.log('click');
+        if(inBasket) {
+          events.emit(AppEvents.view.basketRemove, { card: card })
+          inBasket = false;
+          card.buyButton = buttonSettings.buy;
+        } else {
+          events.emit(AppEvents.view.basketAdd, { card: card });
+          inBasket = true;
+          card.buyButton = buttonSettings.deleteFromBasket;
+        }
+      }
+    });
+  card.buyButton = inBasket ? buttonSettings.deleteFromBasket : buttonSettings.buy;
   const product  = productsData.getProduct(item.card.id);
   modal.render({
     content: card.render({
@@ -78,7 +90,7 @@ events.on(AppEvents.view.cardSelect, (item: {card: CardCatalog}) => {
   })
 });
 
-events.on(AppEvents.view.basketChanged, () => {
+events.on(AppEvents.model.basketChanged, () => {
   const purchaseArray = basketData.getItems().map((item, index) => {
     const card = new CardBasket(cloneTemplate(cardBasketTemplate), events);
     card.setIndex(index + 1);
@@ -89,12 +101,12 @@ events.on(AppEvents.view.basketChanged, () => {
   basket.total = basketData.getTotalCost();
 });
 
-events.on(AppEvents.model.basketAdd, (item: {card: CardProduct}) => {
+events.on(AppEvents.view.basketAdd, (item: {card: CardProduct}) => {
   const purchase  = productsData.getProduct(item.card.id);
   basketData.add(purchase);
 });
 
-events.on(AppEvents.model.basketRemove, (item: {card: CardProduct}) => {
+events.on(AppEvents.view.basketRemove, (item: {card: CardProduct}) => {
   basketData.remove(item.card.id);
 });
 
@@ -162,7 +174,7 @@ events.on(AppEvents.model.contactsSubmit, () => {
         }
       });
       basketData.clearBasket();
-      events.emit(AppEvents.view.basketChanged);
+      
       userData.clearData();
       order.clearPayment();
 

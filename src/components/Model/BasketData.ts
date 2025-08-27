@@ -22,12 +22,12 @@ export class BasketData {
 
   add(item: IProduct) {
     this._items = [...this._items, item];
-    this.events.emit(AppEvents.view.basketChanged);
+    this.events.emit(AppEvents.model.basketChanged);
   }
 
   remove(id: string) {
     this._items = this._items.filter(item => item.id !== id);
-    this.events.emit(AppEvents.view.basketChanged);
+    this.events.emit(AppEvents.model.basketChanged);
   }
 
   getTotalCost(): number {
@@ -47,5 +47,6 @@ export class BasketData {
 
   clearBasket() {
     this._items = [];
+    this.events.emit(AppEvents.model.basketChanged);
   }
 }

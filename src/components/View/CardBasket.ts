@@ -20,7 +20,7 @@ export class CardBasket extends Component<IProduct> {
     this.deleteButton = ensureElement<HTMLButtonElement>('.basket__item-delete', container);
 
     this.deleteButton.addEventListener('click', () =>
-      this.events.emit(AppEvents.model.basketRemove, { card: this })
+      this.events.emit(AppEvents.view.basketRemove, { card: this })
     );
   }
 

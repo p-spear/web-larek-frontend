@@ -29,8 +29,7 @@ export const containers = {
 
 export const AppEvents = {
   model: {
-    basketAdd: 'basket:add',
-    basketRemove: 'basket:remove',
+    basketChanged: 'basket:changed',
     inputChange: 'input:change',
     contactsSubmit: 'contacts:submit'
   },
@@ -38,7 +37,8 @@ export const AppEvents = {
     cardsLoad: 'cards:load',
     cardSelect: 'card:select',
     basketOpen: 'basket:open',
-    basketChanged: 'basket:changed',
+    basketAdd: 'basket:add',
+    basketRemove: 'basket:remove',
     basketSubmit: 'basket:submit',
     orderSubmit: 'order:submit',
     orderFormErrorsChange: 'orderFormErrors:change',

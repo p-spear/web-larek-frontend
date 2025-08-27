@@ -36,8 +36,10 @@ export class CardCatalog extends Component<IProduct> {
   set category(value: string){
     this.setText(this._category, value);
     const classCardCategory: string = Object.keys(cardCategory).find(key => cardCategory[key as keyof typeof cardCategory] === value);
-    this._category.classList.remove('card__category_soft');
-    this._category.classList.add(classCardCategory);
+    this._category.className = `card__category ${classCardCategory}`;
+    //console.log(this._category.className);
+    //this._category.classList.remove('card__category_soft');
+    //this._category.classList.add(classCardCategory);
   }
 
   set image(value: string) {
