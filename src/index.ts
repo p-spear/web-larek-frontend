@@ -41,7 +41,12 @@ const page = new Page(document.body, events);
 const modal = new Modal(ensureElement<HTMLElement>(containers.modal), events);
 
 const basket = new Basket(cloneTemplate(basketTemplate), events);
-const order = new Order(cloneTemplate(orderTemplate), events);
+const order = new Order(cloneTemplate(orderTemplate), events, {
+    onClick: (event: MouseEvent) => {
+      const target = event.target as HTMLInputElement;
+      order.onInputChange('payment', target.name);
+      }
+    });
 const contacts = new Contacts(cloneTemplate(contactsTemplate), events);
 
 api.getProducts()
@@ -64,7 +69,6 @@ events.on(AppEvents.view.cardSelect, (item: {card: CardCatalog}) => {
   let inBasket = basketData.inBasket(item.card.id);
   const card = new CardProduct(cloneTemplate(cardProductTemplate), events, {
     onClick: () => {
-      console.log('click');
         if(inBasket) {
           events.emit(AppEvents.view.basketRemove, { card: card })
           inBasket = false;
@@ -137,6 +141,10 @@ events.on(AppEvents.view.basketSubmit, () => {
 
 events.on(AppEvents.model.inputChange, (data: { field: keyof IUser, value: string }) => {
   userData.setUserInfo(data.field, data.value);
+});
+
+events.on('change: payment', (data: {value: string}) => {
+  order.setPayment(data.value);
 });
 
 events.on(AppEvents.view.orderFormErrorsChange, (errors: Partial<IOrderForm>) => {

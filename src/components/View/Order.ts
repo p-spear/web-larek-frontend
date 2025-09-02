@@ -3,36 +3,28 @@ import { ensureElement } from "../../utils/utils";
 import { IEvents } from "../base/events";
 import { Form } from "./Form";
 
+interface IPaymentActions {
+    onClick: (event: MouseEvent) => void;
+}
+
 export class Order extends Form<IOrderForm> {
   protected cardButton: HTMLButtonElement;
   protected cashButton: HTMLButtonElement;
 
-  constructor(container: HTMLFormElement, events: IEvents) {
+  constructor(container: HTMLFormElement, events: IEvents, actions: IPaymentActions) {
     super(container, events);
     this.cardButton = ensureElement<HTMLButtonElement>("[name='card']", container);
     this.cashButton = ensureElement<HTMLButtonElement>("[name='cash']", container);
 
-    const buttons = container.querySelectorAll('.button');
+    const buttons:  NodeListOf<Element> = container.querySelectorAll('.button');
 
-    this.cardButton.addEventListener('click', (event) => {
-      const target = event.target as HTMLInputElement;
-      this.setPayment(buttons, target);
-    });
-    this.cashButton.addEventListener('click', (event) => {
-      const target = event.target as HTMLInputElement;
-      this.setPayment(buttons, target);
-    });
+    this.cardButton.addEventListener('click', actions.onClick);
+    this.cashButton.addEventListener('click', actions.onClick);
   }
   
-  protected setPayment(buttons: NodeListOf<Element>, target: HTMLInputElement) {
-    buttons.forEach(button => {
-      button.classList.remove('button_alt-active');
-    })
-    if(target) {
-      target.classList.add('button_alt-active');
-      const value = target.name;
-      this.onInputChange('payment', value);
-    }
+  setPayment( value: string) {
+    this.toggleClass(this.cardButton, 'button_alt-active', value === 'card');
+    this.toggleClass(this.cashButton, 'button_alt-active', value === 'cash');
   }
 
   clearPayment():void {

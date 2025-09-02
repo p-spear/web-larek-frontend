@@ -25,6 +25,8 @@ export class UserData {
     this[field] = value;
     switch (field) {
 			case 'payment':
+        this.events.emit('change: payment', {value: value});
+        return this.validateOrder();
 			case 'address':
 				return this.validateOrder();
 			case 'email':
